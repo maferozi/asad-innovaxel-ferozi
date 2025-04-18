@@ -1,5 +1,7 @@
-const generateShortCode = () => {
-    return Math.random().toString(36).substring(2, 8); // Generates a 6-character short code
-  };
+const { nanoid } = require('nanoid');
 
-  module.exports = generateShortCode;
+const generateShortCode = () => {
+  return nanoid(8);  // Generates an 8-character long short code
+};
+
+module.exports = generateShortCode;

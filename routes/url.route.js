@@ -3,6 +3,7 @@ const router = express.Router();
 const Url = require('../models/url.model');
 const validateUrl = require('../middlewares/validateUrl');
 const validateShortCode = require('../middlewares/validateShortCode');
+const generateShortCode = require('../services/generateShortCode');
 
 router.post('/shorten', validateUrl, async (req, res, next) => {
   const { url } = req.body;
