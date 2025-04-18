@@ -121,5 +121,25 @@ router.put('/shorten/:shortCode', async (req, res, next) => {
 });
 
 
+router.delete('/shorten/:shortCode', async (req, res, next) => {
+  const { shortCode } = req.params;
+
+  try {
+    // Find the URL by shortCode
+    const urlToDelete = await Url.findOneAndDelete({ shortCode });
+
+    if (!urlToDelete) {
+      const error = new Error('Short URL not found');
+      error.statusCode = 404;
+      return next(error); // Pass error to global error handler
+    }
+
+    // Successfully deleted
+    res.status(204).json(); // 204 No Content: Success but no content to return
+  } catch (err) {
+    next(err); // Pass error to the global error handler
+  }
+});
+
 
 module.exports = router;
