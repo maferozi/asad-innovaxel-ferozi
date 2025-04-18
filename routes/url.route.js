@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Url = require('../models/url.model');
+const validateUrl = require('../middlewares/validateUrl');
+const validateShortCode = require('../middlewares/validateShortCode');
 
-router.post('/shorten', async (req, res, next) => {
+router.post('/shorten', validateUrl, async (req, res, next) => {
   const { url } = req.body;
 
   try {
@@ -35,7 +37,7 @@ router.post('/shorten', async (req, res, next) => {
 });
 
 // GET stats for a short URL
-router.get('/shorten/:shortCode/stats', async (req, res, next) => {
+router.get('/shorten/:shortCode/stats', validateShortCode, async (req, res, next) => {
   try {
     const { shortCode } = req.params;
 
@@ -59,7 +61,7 @@ router.get('/shorten/:shortCode/stats', async (req, res, next) => {
 });
 
 
-router.get('/shorten/:shortCode', async (req, res, next) => {
+router.get('/shorten/:shortCode', validateShortCode, async (req, res, next) => {
   try {
     const { shortCode } = req.params;
 
@@ -89,7 +91,7 @@ router.get('/shorten/:shortCode', async (req, res, next) => {
 });
 
 
-router.put('/shorten/:shortCode', async (req, res, next) => {
+router.put('/shorten/:shortCode', validateShortCode, validateUrl, async (req, res, next) => {
   try {
     const { shortCode } = req.params;
     const { url } = req.body;
@@ -121,7 +123,7 @@ router.put('/shorten/:shortCode', async (req, res, next) => {
 });
 
 
-router.delete('/shorten/:shortCode', async (req, res, next) => {
+router.delete('/shorten/:shortCode', validateShortCode, async (req, res, next) => {
   const { shortCode } = req.params;
 
   try {
@@ -131,11 +133,11 @@ router.delete('/shorten/:shortCode', async (req, res, next) => {
     if (!urlToDelete) {
       const error = new Error('Short URL not found');
       error.statusCode = 404;
-      return next(error); // Pass error to global error handler
+      return next(error);
     }
 
-    // Successfully deleted
-    res.status(204).json(); // 204 No Content: Success but no content to return
+    
+    res.status(200).json({message: "shortCode deleted successfully"});
   } catch (err) {
     next(err); // Pass error to the global error handler
   }
