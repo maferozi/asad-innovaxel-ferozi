@@ -18,7 +18,7 @@ router.post('/shorten', validateUrl, async (req, res, next) => {
     let exists = true;
 
     while (exists) {
-      shortCode = generateShortCode();
+      shortCode =await generateShortCode();
       exists = await Url.findOne({ shortCode });
     }
 
@@ -138,7 +138,7 @@ router.delete('/shorten/:shortCode', validateShortCode, async (req, res, next) =
     }
 
     
-    res.status(200).json({message: "shortCode deleted successfully"});
+    res.status(200).json({message: "ShortCode deleted successfully"});
   } catch (err) {
     next(err); // Pass error to the global error handler
   }

@@ -1,7 +1,6 @@
-const { nanoid } = require('nanoid');
-
-const generateShortCode = () => {
-  return nanoid(8);  // Generates an 8-character long short code
-};
+async function generateShortCode() {
+  const { nanoid } = await import('nanoid');
+  return nanoid(8);
+}
 
 module.exports = generateShortCode;
