@@ -2,8 +2,40 @@ const express = require('express');
 const router = express.Router();
 const Url = require('../models/url.model');
 
-// GET /api/shorten/:shortCode
-router.get('/shorten/:shortCode', async (req, res, next) => {
+router.post('/shorten', async (req, res, next) => {
+  const { url } = req.body;
+
+  try {
+    const existingUrl = await Url.findOne({ url });
+    if (existingUrl) {
+      return res.status(200).json(existingUrl);
+    }
+
+    let shortCode;
+    let exists = true;
+
+    while (exists) {
+      shortCode = generateShortCode();
+      exists = await Url.findOne({ shortCode });
+    }
+
+    const newUrl = new Url({ url, shortCode });
+    await newUrl.save();
+
+    res.status(201).json({
+      id: newUrl._id,
+      url: newUrl.url,
+      shortCode: newUrl.shortCode,
+      createdAt: newUrl.createdAt,
+      updatedAt: newUrl.updatedAt,
+    });
+  } catch (err) {
+    next(err); // Pass error to the global error handler
+  }
+});
+
+// GET stats for a short URL
+router.get('/shorten/:shortCode/stats', async (req, res, next) => {
   try {
     const { shortCode } = req.params;
 
@@ -13,16 +45,19 @@ router.get('/shorten/:shortCode', async (req, res, next) => {
       return res.status(404).json({ message: 'Short URL not found' });
     }
 
-    // Increment access count
-    urlEntry.accessCount += 1;
-    urlEntry.updatedAt = new Date();
-    await urlEntry.save();
-
-    res.status(200).json(urlEntry);
-  } catch (err) {
-    next(err); // Pass error to middleware
+    res.status(200).json({
+      id: urlEntry._id,
+      url: urlEntry.url,
+      shortCode: urlEntry.shortCode,
+      createdAt: urlEntry.createdAt,
+      updatedAt: urlEntry.updatedAt,
+      accessCount: urlEntry.accessCount,
+    });
+  } catch (error) {
+    next(error);
   }
 });
+
 
 router.get('/shorten/:shortCode', async (req, res, next) => {
   try {
